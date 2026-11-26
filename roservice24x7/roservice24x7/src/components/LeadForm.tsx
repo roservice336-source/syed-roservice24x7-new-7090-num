@@ -3,7 +3,18 @@
 import React, { useState } from 'react';
 import { User, Phone, MapPin, Wrench, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
-export const LeadForm: React.FC = () => {
+// 👇 Yahan humne in props ko accept karne ke liye interface banaya hai 👇
+interface LeadFormProps {
+  preselectedBrand?: string;
+  hideBrandSelector?: boolean;
+  sourcePage?: string;
+}
+
+export const LeadForm: React.FC<LeadFormProps> = ({ 
+  preselectedBrand = "", 
+  hideBrandSelector = false, 
+  sourcePage = "Website" 
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
@@ -56,11 +67,14 @@ export const LeadForm: React.FC = () => {
         {/* Web3Forms Access Key */}
         <input type="hidden" name="access_key" value="375172bb-62e1-4906-b4c6-25b704ea4100" />
         
-        {/* Aapka Email (Lead notification is par aayegi) */}
+        {/* Aapka Email */}
         <input type="hidden" name="email" value="syedsmaula786@gmail.com" />
         
         {/* Form Subject */}
-        <input type="hidden" name="subject" value="New Booking from RO Service 24x7 Website" />
+        <input type="hidden" name="subject" value={`New Booking from RO Service 24x7 Website - ${sourcePage}`} />
+        
+        {/* Source Page (Kahan se form aaya) */}
+        <input type="hidden" name="source_page" value={sourcePage} />
 
         {/* FULL NAME */}
         <div>
@@ -117,31 +131,38 @@ export const LeadForm: React.FC = () => {
           </div>
         </div>
 
-        {/* PURIFIER BRAND */}
-        <div>
-          <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
-            Purifier Brand
-          </label>
-          <div className="relative">
-            <select
-              name="brand"
-              required
-              defaultValue=""
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50 appearance-none"
-            >
-              <option value="" disabled>Select Brand</option>
-              <option value="Kent">Kent</option>
-              <option value="Aquaguard">Aquaguard</option>
-              <option value="Pureit">Pureit</option>
-              <option value="AO Smith">AO Smith</option>
-              <option value="LG">LG</option>
-              <option value="Other">Other</option>
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+        {/* PURIFIER BRAND (Sirf tab dikhega jab hideBrandSelector false ho) */}
+        {!hideBrandSelector && (
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
+              Purifier Brand
+            </label>
+            <div className="relative">
+              <select
+                name="brand"
+                required
+                defaultValue={preselectedBrand}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50 appearance-none"
+              >
+                <option value="" disabled>Select Brand</option>
+                <option value="Kent">Kent</option>
+                <option value="Aquaguard">Aquaguard</option>
+                <option value="Pureit">Pureit</option>
+                <option value="AO Smith">AO Smith</option>
+                <option value="LG">LG</option>
+                <option value="Other">Other</option>
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Agar Brand selector hidden hai, toh brand value hidden input se bhejenge */}
+        {hideBrandSelector && preselectedBrand && (
+          <input type="hidden" name="brand" value={preselectedBrand} />
+        )}
 
         {/* SERVICE REQUIRED */}
         <div>
