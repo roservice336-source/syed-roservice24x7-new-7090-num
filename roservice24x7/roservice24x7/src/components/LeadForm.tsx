@@ -5,35 +5,37 @@ export const LeadForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
     const formData = new FormData(event.currentTarget);
-    const object = Object.fromEntries(formData);
-    const json = JSON.stringify(object);
+    
+    // 👇 YAHAN APNI WEB3FORMS ACCESS KEY DAALEIN 👇
+    formData.append("access_key", "YOUR_ACCESS_KEY_HERE"); 
+
+    // Formspree/Web3forms ke liye custom subject (optional)
+    formData.append("subject", "New Doorstep Booking - RO Service 24x7");
+    formData.append("from_name", "RO Service 24x7 Website");
 
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json"
-        },
-        body: json
+        body: formData
       });
 
       const data = await response.json();
 
       if (data.success) {
         setSubmitStatus('success');
-        (event.target as HTMLFormElement).reset(); 
+        (event.target as HTMLFormElement).reset(); // Form clear kar dega
       } else {
+        console.error("Error", data);
         setSubmitStatus('error');
       }
     } catch (error) {
-      console.error("Form Error:", error);
+      console.error("Error", error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -49,14 +51,7 @@ export const LeadForm: React.FC = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        
-        {/* AAPKI ACCESS KEY YAHAN HAI */}
-        <input type="hidden" name="access_key" value="375172bb-62e1-4906-b4c6-25b704ea4100" />
-        
-        {/* Web3Forms ke liye hidden email field */}
-        <input type="hidden" name="email" value="no-reply@roservice24x7.in" />
-
+      <form onSubmit={onSubmit} className="space-y-5">
         {/* FULL NAME */}
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
@@ -69,7 +64,7 @@ export const LeadForm: React.FC = () => {
               name="name"
               required
               placeholder="Enter your full name"
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50"
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 bg-slate-50/50"
             />
           </div>
         </div>
@@ -89,7 +84,7 @@ export const LeadForm: React.FC = () => {
               pattern="[0-9]{10}"
               maxLength={10}
               placeholder="10 digit mobile number"
-              className="w-full pl-16 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50"
+              className="w-full pl-16 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 bg-slate-50/50"
             />
           </div>
         </div>
@@ -97,17 +92,18 @@ export const LeadForm: React.FC = () => {
         {/* PINCODE */}
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
-            Bangalore Pincode
+            Bangalore Pincode <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
             <input
               type="text"
               name="pincode"
+              required
               pattern="[0-9]{6}"
               maxLength={6}
               placeholder="Enter 6 digit pincode"
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50"
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 bg-slate-50/50"
             />
           </div>
         </div>
@@ -122,7 +118,7 @@ export const LeadForm: React.FC = () => {
               name="brand"
               required
               defaultValue=""
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50 appearance-none"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 bg-slate-50/50 appearance-none"
             >
               <option value="" disabled>Select Brand</option>
               <option value="Kent">Kent</option>
@@ -132,6 +128,7 @@ export const LeadForm: React.FC = () => {
               <option value="LG">LG</option>
               <option value="Other">Other</option>
             </select>
+            {/* Custom Arrow for select */}
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
             </div>
@@ -149,7 +146,7 @@ export const LeadForm: React.FC = () => {
               name="service"
               required
               defaultValue="RO Water Purifier Service"
-              className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50 appearance-none"
+              className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 bg-slate-50/50 appearance-none"
             >
               <option value="RO Water Purifier Service">RO Water Purifier Service</option>
               <option value="RO Installation">RO Installation</option>
@@ -163,11 +160,25 @@ export const LeadForm: React.FC = () => {
           </div>
         </div>
 
-        {/* SUBMIT BUTTON */}
+        {/* SUBMIT BUTTON & STATUS MESSAGES */}
+        {submitStatus === 'success' && (
+          <div className="bg-green-50 text-green-700 p-4 rounded-xl flex items-center gap-2 text-sm font-medium">
+            <CheckCircle2 className="w-5 h-5 shrink-0" />
+            Booking successful! We will call you shortly.
+          </div>
+        )}
+
+        {submitStatus === 'error' && (
+          <div className="bg-red-50 text-red-700 p-4 rounded-xl flex items-center gap-2 text-sm font-medium">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            Something went wrong. Please try calling us directly.
+          </div>
+        )}
+
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#00a86b] hover:bg-[#00915c] text-white font-bold text-lg py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-md mt-2"
+          className="w-full bg-[#00a86b] hover:bg-[#00915c] text-white font-bold text-lg py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-md"
         >
           {isSubmitting ? (
             <>
@@ -181,21 +192,6 @@ export const LeadForm: React.FC = () => {
             </>
           )}
         </button>
-        
-        {/* SUCCESS / ERROR MESSAGES */}
-        {submitStatus === 'success' && (
-          <div className="bg-green-50 text-green-700 p-4 rounded-xl flex items-center justify-center gap-2 text-sm font-medium mt-4">
-            <CheckCircle2 className="w-5 h-5 shrink-0" />
-            Booking successful! We will call you shortly.
-          </div>
-        )}
-
-        {submitStatus === 'error' && (
-          <div className="bg-red-50 text-red-700 p-4 rounded-xl flex items-center justify-center gap-2 text-sm font-medium mt-4">
-            <AlertCircle className="w-5 h-5 shrink-0" />
-            Something went wrong. Please call us directly.
-          </div>
-        )}
       </form>
     </div>
   );
