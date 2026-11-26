@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { User, Phone, MapPin, ArrowRight, CheckCircle2, AlertCircle, Loader2, Home, MessageSquare } from 'lucide-react';
 
 interface LeadFormProps {
-  preselectedBrand?: string; // Isko chhupa diya hai UI se, par background me kaam aayega
-  hideBrandSelector?: boolean; // Zaroorat nahi hai ab, par error na aaye isliye rakh rahe hain
+  preselectedBrand?: string;
+  hideBrandSelector?: boolean;
   sourcePage?: string;
 }
 
@@ -22,6 +22,12 @@ export const LeadForm: React.FC<LeadFormProps> = ({
     setSubmitStatus('idle');
 
     const formData = new FormData(event.currentTarget);
+    
+    // Agar aapko email me +91 ke saath number chahiye, toh hum backend par bhejte waqt add kar sakte hain
+    // Ya phir formData me hi modify kar sakte hain (optional)
+    const phone = formData.get('phone');
+    formData.set('phone', `+91 ${phone}`);
+
     const object = Object.fromEntries(formData);
     const json = JSON.stringify(object);
 
@@ -86,24 +92,21 @@ export const LeadForm: React.FC<LeadFormProps> = ({
           </div>
         </div>
 
-        {/* MOBILE NUMBER */}
+        {/* MOBILE NUMBER (Clean look without +91) */}
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
             Mobile Number <span className="text-red-500">*</span>
           </label>
-          <div className="relative flex items-center w-full rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-[#0c54a0] focus-within:border-transparent bg-slate-50/50 overflow-hidden">
-            <div className="pl-3 pr-2 flex items-center text-slate-400">
-              <Phone className="w-5 h-5" />
-            </div>
-            <span className="text-slate-600 font-medium pr-1 select-none">+91</span>
+          <div className="relative">
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
             <input
               type="tel"
               name="phone"
               required
               pattern="[0-9]{10}"
               maxLength={10}
-              placeholder="10 digit mobile number"
-              className="flex-1 w-full py-3 pr-4 bg-transparent focus:outline-none text-slate-700"
+              placeholder="Enter 10 digit mobile number"
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50"
             />
           </div>
         </div>
