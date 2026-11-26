@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Phone, CheckCircle2, AlertCircle, Loader2, User, MapPin, Wrench, MessageSquare, ArrowRight, Mail, Sparkles } from 'lucide-react';
+import { Phone, CheckCircle2, AlertCircle, Loader2, User, MapPin, Wrench, MessageSquare, ArrowRight, Mail } from 'lucide-react';
 import { BUSINESS_DETAILS } from '../data/content';
 import { LeadFormData } from '../types';
 
@@ -187,19 +187,6 @@ export const LeadForm: React.FC<LeadFormProps> = ({
     if (formWarning) setFormWarning(null);
   };
 
-  // Quick fill sample data for quick testing
-  const handleQuickFill = () => {
-    setFormData({
-      fullName: 'Ravi Test Booking',
-      mobileNumber: '7090170092',
-      pinCode: '560001',
-      selectedBrand: preselectedBrand || 'Kent',
-      serviceType: SERVICE_OPTIONS[0],
-    });
-    setErrors({});
-    setFormWarning(null);
-  };
-
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (!validate()) {
       e.preventDefault();
@@ -208,7 +195,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
 
     // Do NOT call e.preventDefault() on valid submit!
     // Allowing native form submission to target="formsubmit_hidden_iframe"
-    // lets the browser execute standard HTML <form action="https://formsubmit.co/ravi2009u@gmail.com" method="POST">
+    // lets the browser execute standard HTML <form action="https://formsubmit.co/..." method="POST">
     // without reloading the parent page, while React transitions immediately to the Thank You screen.
     setIsSubmitting(true);
     setFormWarning(null);
@@ -225,34 +212,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
       bookedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
     };
 
-    const emailTarget = BUSINESS_DETAILS.formSubmitEmail || 'syedsmaula786@gmail.com';
-
-    // Also send multipart/form-data to FormSubmit AJAX endpoint as secondary redundancy
-    try {
-      const fd = new FormData();
-      fd.append('name', submissionPayload.fullName);
-      fd.append('mobile', `+91 ${submissionPayload.mobileNumber}`);
-      fd.append('pincode', submissionPayload.pinCode);
-      fd.append('brand', submissionPayload.selectedBrand);
-      fd.append('service', submissionPayload.serviceType);
-      fd.append('reference_id', submissionPayload.referenceId);
-      fd.append('source_page', submissionPayload.sourcePage);
-      fd.append('_subject', `New RO Service Booking #${submissionPayload.referenceId}: ${submissionPayload.fullName} (${submissionPayload.selectedBrand})`);
-      fd.append('_template', 'table');
-      fd.append('_captcha', 'false');
-
-      fetch(`https://formsubmit.co/ajax/${emailTarget}`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-        },
-        body: fd,
-      }).catch(() => {});
-    } catch {
-      // Ignore network error if native form POST already succeeded
-    }
-
-    // Persist lead on server via /api/lead
+    // Persist lead on server via /api/lead (Database/Save logic)
     try {
       fetch('/api/lead', {
         method: 'POST',
@@ -669,18 +629,6 @@ export const LeadForm: React.FC<LeadFormProps> = ({
                 </span>
               )}
             </button>
-
-            {/* Quick Fill Test Link */}
-            <div className="text-center pt-1">
-              <button
-                type="button"
-                onClick={handleQuickFill}
-                className="text-[11px] text-slate-400 hover:text-sky-600 font-medium inline-flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <Sparkles className="w-3 h-3 text-amber-500" />
-                <span>Auto-fill test details</span>
-              </button>
-            </div>
           </form>
         </>
       )}
