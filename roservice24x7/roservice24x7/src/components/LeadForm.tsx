@@ -1,18 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { User, Phone, MapPin, Wrench, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { User, Phone, MapPin, ArrowRight, CheckCircle2, AlertCircle, Loader2, Home, MessageSquare } from 'lucide-react';
 
-// 👇 Yahan humne in props ko accept karne ke liye interface banaya hai 👇
 interface LeadFormProps {
-  preselectedBrand?: string;
-  hideBrandSelector?: boolean;
+  preselectedBrand?: string; // Isko chhupa diya hai UI se, par background me kaam aayega
+  hideBrandSelector?: boolean; // Zaroorat nahi hai ab, par error na aaye isliye rakh rahe hain
   sourcePage?: string;
 }
 
 export const LeadForm: React.FC<LeadFormProps> = ({ 
   preselectedBrand = "", 
-  hideBrandSelector = false, 
   sourcePage = "Website" 
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,17 +62,12 @@ export const LeadForm: React.FC<LeadFormProps> = ({
 
       <form onSubmit={handleSubmit} className="space-y-5">
         
-        {/* Web3Forms Access Key */}
+        {/* Hidden Fields */}
         <input type="hidden" name="access_key" value="375172bb-62e1-4906-b4c6-25b704ea4100" />
-        
-        {/* Aapka Email */}
         <input type="hidden" name="email" value="syedsmaula786@gmail.com" />
-        
-        {/* Form Subject */}
         <input type="hidden" name="subject" value={`New Booking from RO Service 24x7 Website - ${sourcePage}`} />
-        
-        {/* Source Page (Kahan se form aaya) */}
         <input type="hidden" name="source_page" value={sourcePage} />
+        {preselectedBrand && <input type="hidden" name="brand" value={preselectedBrand} />}
 
         {/* FULL NAME */}
         <div>
@@ -98,9 +91,11 @@ export const LeadForm: React.FC<LeadFormProps> = ({
           <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
             Mobile Number <span className="text-red-500">*</span>
           </label>
-          <div className="relative flex items-center">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <span className="absolute left-10 text-slate-600 font-medium">+91</span>
+          <div className="relative flex items-center w-full rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-[#0c54a0] focus-within:border-transparent bg-slate-50/50 overflow-hidden">
+            <div className="pl-3 pr-2 flex items-center text-slate-400">
+              <Phone className="w-5 h-5" />
+            </div>
+            <span className="text-slate-600 font-medium pr-1 select-none">+91</span>
             <input
               type="tel"
               name="phone"
@@ -108,7 +103,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
               pattern="[0-9]{10}"
               maxLength={10}
               placeholder="10 digit mobile number"
-              className="w-full pl-16 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50"
+              className="flex-1 w-full py-3 pr-4 bg-transparent focus:outline-none text-slate-700"
             />
           </div>
         </div>
@@ -116,13 +111,14 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         {/* PINCODE */}
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
-            Bangalore Pincode
+            Bangalore Pincode <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
             <input
               type="text"
               name="pincode"
+              required
               pattern="[0-9]{6}"
               maxLength={6}
               placeholder="Enter 6 digit pincode"
@@ -131,61 +127,36 @@ export const LeadForm: React.FC<LeadFormProps> = ({
           </div>
         </div>
 
-        {/* PURIFIER BRAND (Sirf tab dikhega jab hideBrandSelector false ho) */}
-        {!hideBrandSelector && (
-          <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
-              Purifier Brand
-            </label>
-            <div className="relative">
-              <select
-                name="brand"
-                required
-                defaultValue={preselectedBrand}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50 appearance-none"
-              >
-                <option value="" disabled>Select Brand</option>
-                <option value="Kent">Kent</option>
-                <option value="Aquaguard">Aquaguard</option>
-                <option value="Pureit">Pureit</option>
-                <option value="AO Smith">AO Smith</option>
-                <option value="LG">LG</option>
-                <option value="Other">Other</option>
-              </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Agar Brand selector hidden hai, toh brand value hidden input se bhejenge */}
-        {hideBrandSelector && preselectedBrand && (
-          <input type="hidden" name="brand" value={preselectedBrand} />
-        )}
-
-        {/* SERVICE REQUIRED */}
+        {/* ADDRESS */}
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
-            Service Required
+            Full Address <span className="text-red-500">*</span>
           </label>
-          <div className="relative flex items-center">
-            <Wrench className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 z-10" />
-            <select
-              name="service"
+          <div className="relative">
+            <Home className="absolute left-3 top-4 text-slate-400 w-5 h-5" />
+            <textarea
+              name="address"
               required
-              defaultValue="RO Water Purifier Service"
-              className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50 appearance-none"
-            >
-              <option value="RO Water Purifier Service">RO Water Purifier Service</option>
-              <option value="RO Installation">RO Installation</option>
-              <option value="Filter Replacement">Filter Replacement</option>
-              <option value="RO Repair">RO Repair</option>
-              <option value="AMC Plan">AMC Plan</option>
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
+              rows={2}
+              placeholder="Enter your area, building, flat no."
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50 resize-none"
+            ></textarea>
+          </div>
+        </div>
+
+        {/* MESSAGE */}
+        <div>
+          <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">
+            Message (Optional)
+          </label>
+          <div className="relative">
+            <MessageSquare className="absolute left-3 top-4 text-slate-400 w-5 h-5" />
+            <textarea
+              name="message"
+              rows={2}
+              placeholder="Describe your issue (e.g., water leaking, filter change)"
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0c54a0] focus:border-transparent text-slate-700 bg-slate-50/50 resize-none"
+            ></textarea>
           </div>
         </div>
 
